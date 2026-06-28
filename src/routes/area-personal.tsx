@@ -428,12 +428,17 @@ function AreaPersonalPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function loadProfile(userId: string) {
-    setLoadingProfile(true);
-    const { data } = await supabase.from("perfiles").select("*").eq("id", userId).single();
-    if (data) setAppUser(data as AppUser);
+async function loadProfile(userId: string) {
+  setLoadingProfile(true);
+  const { data, error } = await supabase.from("perfiles").select("*").eq("id", userId).single();
+  if (data) {
+    setAppUser(data as AppUser);
+  } else {
+    console.error("Error cargando perfil:", error);
     setLoadingProfile(false);
   }
+  setLoadingProfile(false);
+}
 
   async function handleLogout() {
     await supabase.auth.signOut();

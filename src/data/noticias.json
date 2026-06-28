@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "estreno-estudio",
+    "titulo": "La radio estrena estudio",
+    "fecha": "2026-06-22",
+    "categoria": "Centro",
+    "resumen": "Radio Bezmiliana inaugura un nuevo espacio de grabación con mesa de mezclas profesional, microfonía dinámica y aislamiento acústico.",
+    "imagen": "estudio",
+    "contenido": "Tras meses de obra y montaje, el equipo de Radio Bezmiliana ha estrenado oficialmente su nuevo estudio. Un espacio diseñado para grabar hasta cuatro voces en simultáneo, con mesa de mezclas digital, microfonía profesional y un completo aislamiento acústico que eleva la calidad de los podcasts."
+  },
+  {
+    "slug": "concurso-podcasts",
+    "titulo": "Concurso de podcasts del IES",
+    "fecha": "2026-06-10",
+    "categoria": "Eventos",
+    "resumen": "Se abre el plazo para presentar podcasts originales en categorías de actualidad, ficción sonora, divulgación y música.",
+    "imagen": "concurso",
+    "contenido": "El IES Bezmiliana convoca su primer concurso interno de podcasts. Los equipos podrán inscribirse en cuatro categorías: actualidad, ficción sonora, divulgación y música. Los proyectos finalistas se emitirán en directo y formarán parte del programa especial de fin de curso."
+  },
+  {
+    "slug": "entrevista-director",
+    "titulo": "Entrevista al director: balance del curso",
+    "fecha": "2026-06-02",
+    "categoria": "Entrevistas",
+    "resumen": "Hablamos con el director del centro sobre los proyectos del año, los retos del curso que viene y el papel de la radio escolar.",
+    "imagen": "entrevista",
+    "contenido": "El director del IES Bezmiliana visita el estudio para repasar los hitos del curso: nuevas instalaciones, intercambios europeos, premios deportivos y, por supuesto, el papel cada vez más importante de la radio como herramienta educativa y de cohesión."
+  }
+]

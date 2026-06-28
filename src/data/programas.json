@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "buenos-dias-bezmiliana",
+    "nombre": "Buenos Días Bezmiliana",
+    "categoria": "Magazine matinal",
+    "descripcion": "El despertar del instituto: noticias, actualidad, agenda cultural y las voces de quienes hacen vida en el IES Bezmiliana cada mañana.",
+    "sinopsis": "Buenos Días Bezmiliana abre cada semana con un magazine de actualidad escolar. Un equipo rotatorio de alumnos repasa lo más relevante del centro, entrevista a invitados, anuncia eventos y comparte recomendaciones culturales. Un café radiofónico para empezar la jornada informados.",
+    "presentadores": ["Lucía Romero", "Adrián Soler", "Equipo de redacción"],
+    "frecuencia": "Lunes y miércoles · 08:15",
+    "color": "#ef4444",
+    "imagen": "buenos-dias",
+    "episodios": 12
+  },
+  {
+    "slug": "musica-y-mas",
+    "nombre": "Música y Más",
+    "categoria": "Música y cultura",
+    "descripcion": "Listas, descubrimientos, géneros y bandas sonoras que marcan generaciones. Un viaje semanal por todo lo que suena.",
+    "sinopsis": "Música y Más recorre estilos y épocas con criterio y entusiasmo. Cada episodio gira en torno a una temática: un género, una banda sonora, un país o un fenómeno viral. Recomendaciones, contexto y la mejor selección musical curada por el equipo.",
+    "presentadores": ["Nuria Vega", "Carlos Ibáñez"],
+    "frecuencia": "Jueves · 13:30",
+    "color": "#ef4444",
+    "imagen": "musica",
+    "episodios": 18
+  },
+  {
+    "slug": "deportes-bezmiliana",
+    "nombre": "Deportes Bezmiliana",
+    "categoria": "Deportes",
+    "descripcion": "Toda la actualidad deportiva del centro: liga interna, torneos, entrevistas y crónicas en directo.",
+    "sinopsis": "Deportes Bezmiliana es la voz del deporte escolar. Cubrimos la liga interna, los torneos federados, los entrenamientos de los equipos del IES y entrevistamos a sus protagonistas. Pasión, cifras y vestuario, semana a semana.",
+    "presentadores": ["Pablo Castro", "David Martín"],
+    "frecuencia": "Viernes · 14:00",
+    "color": "#ef4444",
+    "imagen": "deportes",
+    "episodios": 9
+  }
+]

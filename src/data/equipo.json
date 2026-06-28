@@ -1,0 +1,50 @@
+{
+  "grupos": [
+    {
+      "key": "direccion",
+      "titulo": "Dirección",
+      "subtitulo": "Coordinación y dirección de la radio",
+      "miembros": [
+        { "nombre": "José Pérez", "rol": "Director", "bio": "Coordina la programación semanal y supervisa los contenidos editoriales." },
+        { "nombre": "María García", "rol": "Directora adjunta", "bio": "Supervisa la producción y coordina al equipo de locutores y técnicos." }
+      ]
+    },
+    {
+      "key": "locucion",
+      "titulo": "Locución",
+      "subtitulo": "Las voces de Radio Bezmiliana",
+      "miembros": [
+        { "nombre": "Pablo Castro", "rol": "Locutor · Deportes", "bio": "2º Bachillerato" },
+        { "nombre": "David Martín", "rol": "Locutor · Deportes", "bio": "2º Bachillerato" },
+        { "nombre": "Lucía Romero", "rol": "Locutora · Magazine", "bio": "1º Bachillerato" },
+        { "nombre": "Adrián Soler", "rol": "Locutor · Magazine", "bio": "1º Bachillerato" },
+        { "nombre": "Nuria Vega", "rol": "Locutora · Música", "bio": "4º ESO" },
+        { "nombre": "Carlos Ibáñez", "rol": "Locutor · Música", "bio": "4º ESO" }
+      ]
+    },
+    {
+      "key": "guiones",
+      "titulo": "Redacción de guiones",
+      "subtitulo": "Quienes dan forma a cada programa",
+      "miembros": [
+        { "nombre": "Equipo de redacción", "rol": "Redacción y escaletas", "bio": "Redactan guiones, contactan invitados y preparan los contenidos de cada episodio." }
+      ]
+    },
+    {
+      "key": "tecnico",
+      "titulo": "Técnico de sonido",
+      "subtitulo": "Producción y postproducción",
+      "miembros": [
+        { "nombre": "Equipo de sonido", "rol": "Mezcla, microfonía y postproducción", "bio": "Controla mesa, niveles y edición final de todos los episodios." }
+      ]
+    },
+    {
+      "key": "rrss",
+      "titulo": "Redes sociales",
+      "subtitulo": "Comunicación y difusión",
+      "miembros": [
+        { "nombre": "Equipo de redes", "rol": "Instagram y YouTube", "bio": "Gestiona las redes sociales, publica contenido y hace crecer la comunidad de Radio Bezmiliana." }
+      ]
+    }
+  ]
+}

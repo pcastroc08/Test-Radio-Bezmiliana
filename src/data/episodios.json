@@ -1,0 +1,83 @@
+[
+  {
+    "id": "bd-1",
+    "programaSlug": "buenos-dias-bezmiliana",
+    "titulo": "Entrevista al director",
+    "fecha": "2026-06-20",
+    "duracion": "32:14",
+    "descripcion": "Charla cercana con el director del IES Bezmiliana sobre el balance del curso, los nuevos proyectos y los retos del próximo trimestre.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  },
+  {
+    "id": "bd-2",
+    "programaSlug": "buenos-dias-bezmiliana",
+    "titulo": "Noticias de la semana",
+    "fecha": "2026-06-13",
+    "duracion": "21:47",
+    "descripcion": "Repaso a las novedades del centro: certámenes, salidas, becas y el calendario de la última semana lectiva.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+  },
+  {
+    "id": "bd-3",
+    "programaSlug": "buenos-dias-bezmiliana",
+    "titulo": "Especial fin de curso",
+    "fecha": "2026-06-06",
+    "duracion": "45:02",
+    "descripcion": "Programa especial con voces de alumnos, profesores y familias para celebrar todo lo vivido durante el curso 2025/26.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+  },
+  {
+    "id": "mm-1",
+    "programaSlug": "musica-y-mas",
+    "titulo": "Top 10 del mes",
+    "fecha": "2026-06-19",
+    "duracion": "38:55",
+    "descripcion": "Las diez canciones más votadas por los oyentes este mes. De pop a indie pasando por trap nacional.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
+  },
+  {
+    "id": "mm-2",
+    "programaSlug": "musica-y-mas",
+    "titulo": "Especial Eurovisión",
+    "fecha": "2026-05-15",
+    "duracion": "52:12",
+    "descripcion": "Análisis a fondo del festival más visto del año: candidaturas, favoritos, anécdotas y la final comentada.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"
+  },
+  {
+    "id": "mm-3",
+    "programaSlug": "musica-y-mas",
+    "titulo": "Música de videojuegos",
+    "fecha": "2026-05-08",
+    "duracion": "41:30",
+    "descripcion": "Un viaje por las bandas sonoras que han marcado a generaciones de jugadores: de los 8 bits a las orquestas sinfónicas.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
+  },
+  {
+    "id": "db-1",
+    "programaSlug": "deportes-bezmiliana",
+    "titulo": "Liga interna",
+    "fecha": "2026-06-21",
+    "duracion": "27:48",
+    "descripcion": "Resumen de la jornada decisiva de la liga interna: goles, polémicas y clasificación final.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"
+  },
+  {
+    "id": "db-2",
+    "programaSlug": "deportes-bezmiliana",
+    "titulo": "Torneo de fútbol",
+    "fecha": "2026-06-14",
+    "duracion": "34:09",
+    "descripcion": "Cobertura del torneo intercentros: entrevistas a entrenadores, capitanes y resultados de la fase final.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+  },
+  {
+    "id": "db-3",
+    "programaSlug": "deportes-bezmiliana",
+    "titulo": "Entrevista al equipo de baloncesto",
+    "fecha": "2026-06-07",
+    "duracion": "29:31",
+    "descripcion": "Charlamos con el equipo de baloncesto del IES tras una temporada histórica. Anécdotas, objetivos y futuro.",
+    "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"
+  }
+]

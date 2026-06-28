@@ -1,0 +1,8 @@
+[
+  { "id": 1, "imagen": "g1", "alt": "Micrófono profesional en estudio", "ratio": "portrait" },
+  { "id": 2, "imagen": "g2", "alt": "Mesa de mezclas con LEDs", "ratio": "landscape" },
+  { "id": 3, "imagen": "g3", "alt": "Pared acústica del estudio", "ratio": "square" },
+  { "id": 4, "imagen": "g4", "alt": "Auriculares sobre guion de podcast", "ratio": "portrait" },
+  { "id": 5, "imagen": "g5", "alt": "Presentador grabando un episodio", "ratio": "square" },
+  { "id": 6, "imagen": "g6", "alt": "Cartel ON-AIR encendido en estudio", "ratio": "landscape" }
+]

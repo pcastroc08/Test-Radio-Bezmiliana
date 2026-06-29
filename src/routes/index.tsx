@@ -1,10 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Mic, Radio, Sparkles } from "lucide-react";
+import { Mic, Sparkles } from "lucide-react";
 import { Hero } from "@/components/hero";
-import { ProgramCard } from "@/components/program-card";
 import { SectionReveal } from "@/components/section-reveal";
-import programas from "@/data/programas.json";
-import type { Programa } from "@/data/types";
 
 export const Route = createFileRoute("/")(  {
   head: () => ({
@@ -25,39 +22,9 @@ export const Route = createFileRoute("/")(  {
 });
 
 function Index() {
-  const progs = programas as Programa[];
-
   return (
     <>
       <Hero />
-
-      {/* Programas destacados */}
-      <section className="relative mx-auto max-w-7xl px-6 py-24">
-        <SectionReveal className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
-              <Radio className="h-3 w-3" /> Nuestros programas
-            </div>
-            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Nuestros programas
-            </h2>
-          </div>
-          <Link
-            to="/programas"
-            className="group inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary transition hover:gap-2.5"
-          >
-            Ver todos <ArrowRight className="h-4 w-4" />
-          </Link>
-        </SectionReveal>
-
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {progs.map((p, i) => (
-            <SectionReveal key={p.slug} delay={i * 80}>
-              <ProgramCard programa={p} />
-            </SectionReveal>
-          ))}
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="relative mx-auto max-w-7xl px-6 py-24">

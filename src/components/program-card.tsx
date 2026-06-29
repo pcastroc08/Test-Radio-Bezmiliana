@@ -2,7 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Mic } from "lucide-react";
 
 export function ProgramCard({ programa }: { programa: any }) {
-  const img = programa.imagen_url;
+  const img = programa.imagen
+    ? `/src/assets/programa-${programa.imagen}.jpg`
+    : null;
   return (
     <Link
       to="/programas/$slug"
@@ -13,7 +15,7 @@ export function ProgramCard({ programa }: { programa: any }) {
         {img ? (
           <img
             src={img}
-            alt={programa.titulo}
+            alt={programa.nombre}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -31,7 +33,7 @@ export function ProgramCard({ programa }: { programa: any }) {
         )}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <h3 className="font-display text-xl font-bold tracking-tight">{programa.titulo}</h3>
+        <h3 className="font-display text-xl font-bold tracking-tight">{programa.nombre}</h3>
         {programa.descripcion && (
           <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">{programa.descripcion}</p>
         )}

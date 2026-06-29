@@ -1,10 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Mic } from "lucide-react";
+import { PROGRAMA_IMAGES } from "@/utils/images";
 
 export function ProgramCard({ programa }: { programa: any }) {
-  const img = programa.imagen
-    ? `/src/assets/programa-${programa.imagen}.jpg`
-    : null;
+  const img = programa.imagen ? PROGRAMA_IMAGES[programa.imagen] : null;
   return (
     <Link
       to="/programas/$slug"

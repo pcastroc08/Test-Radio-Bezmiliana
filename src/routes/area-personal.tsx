@@ -356,13 +356,10 @@ function ProgramasPanel() {
 
 // ─── NoticiasPanel ────────────────────────────────────────────────────────────
 
-type NoticiaForm = { open: boolean; id?: string; titulo: string; texto: string; imagen_url: string };
-const NOTICIA_VACIA: NoticiaForm = { open: false, titulo: "", texto: "", imagen_url: "" };
-
 function NoticiasPanel() {
   const [noticias, setNoticias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<NoticiaForm>(NOTICIA_VACIA);
+  const [form, setForm] = useState<{ open: boolean; id?: string; titulo: string; texto: string }>({ open: false, titulo: "", texto: "" });
 
   useEffect(() => { fetchNoticias(); }, []);
 
@@ -375,13 +372,12 @@ function NoticiasPanel() {
 
   async function handleSave() {
     if (!form.titulo) return;
-    const payload = { titulo: form.titulo, texto: form.texto, imagen_url: form.imagen_url || null };
     if (form.id) {
-      await supabase.from("noticias").update(payload).eq("id", form.id);
+      await supabase.from("noticias").update({ titulo: form.titulo, texto: form.texto }).eq("id", form.id);
     } else {
-      await supabase.from("noticias").insert(payload);
+      await supabase.from("noticias").insert({ titulo: form.titulo, texto: form.texto });
     }
-    setForm(NOTICIA_VACIA);
+    setForm({ open: false, titulo: "", texto: "" });
     fetchNoticias();
   }
 
@@ -392,26 +388,17 @@ function NoticiasPanel() {
   }
 
   return (
-    <Panel title="Noticias" onAdd={() => setForm({ ...NOTICIA_VACIA, open: true })}>
+    <Panel title="Noticias" onAdd={() => setForm({ open: true, titulo: "", texto: "" })}>
       {form.open && (
-        <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm(NOTICIA_VACIA)} onSave={handleSave}>
+        <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm({ open: false, titulo: "", texto: "" })} onSave={handleSave}>
           <Field label="Título" value={form.titulo} onChange={(v) => setForm(f => ({ ...f, titulo: v }))} />
           <Field label="Texto" value={form.texto} onChange={(v) => setForm(f => ({ ...f, texto: v }))} textarea />
-          <FileUploadField
-            label="Imagen de portada"
-            accept="image/*"
-            icon={ImageIcon}
-            currentUrl={form.imagen_url}
-            onUploaded={(url) => setForm(f => ({ ...f, imagen_url: url }))}
-          />
         </FormModal>
       )}
       {loading ? <Spinner /> : noticias.length === 0 ? <Empty text="No hay noticias todavía" /> : (
         <ul className="space-y-3">
           {noticias.map((n) => (
-            <ItemRow key={n.id} title={n.titulo} subtitle={n.fecha}
-              onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, texto: n.texto ?? "", imagen_url: n.imagen_url ?? "" })}
-              onDelete={() => handleDelete(n.id)} />
+            <ItemRow key={n.id} title={n.titulo} subtitle={n.fecha} onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, texto: n.texto ?? "" })} onDelete={() => handleDelete(n.id)} />
           ))}
         </ul>
       )}

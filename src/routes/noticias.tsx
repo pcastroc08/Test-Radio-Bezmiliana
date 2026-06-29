@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/page-shell";
 import { NewsCard } from "@/components/news-card";
 import { SectionReveal } from "@/components/section-reveal";
-import { supabase } from "@/lib/supabase";
+import noticias from "@/data/noticias.json";
+import type { Noticia } from "@/data/types";
 
 export const Route = createFileRoute("/noticias")({
   head: () => ({
@@ -20,17 +20,7 @@ export const Route = createFileRoute("/noticias")({
 });
 
 function NoticiasPage() {
-  const [noticias, setNoticias] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.from("noticias").select("*").order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setNoticias(data ?? []);
-        setLoading(false);
-      });
-  }, []);
-
+  const list = noticias as Noticia[];
   return (
     <>
       <PageHeader
@@ -39,21 +29,13 @@ function NoticiasPage() {
         description="Estrenos, eventos, premios y todo lo que pasa dentro y fuera del estudio."
       />
       <section className="mx-auto max-w-7xl px-6 pb-24">
-        {loading ? (
-          <div className="py-20 text-center text-muted-foreground">Cargando noticias...</div>
-        ) : noticias.length === 0 ? (
-          <div className="glass rounded-3xl border border-white/5 p-12 text-center text-muted-foreground">
-            No hay noticias publicadas todavía.
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {noticias.map((n, i) => (
-              <SectionReveal key={n.id} delay={i * 70}>
-                <NewsCard noticia={n} />
-              </SectionReveal>
-            ))}
-          </div>
-        )}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {list.map((n, i) => (
+            <SectionReveal key={n.slug} delay={i * 70}>
+              <NewsCard noticia={n} />
+            </SectionReveal>
+          ))}
+        </div>
       </section>
     </>
   );

@@ -1,9 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, useRef } from "react";
+import { supabase, uploadMedia } from "@/lib/supabase";
 import type { UserRole, AppUser } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
-import { Lock, LogOut, Plus, Trash2, Pencil, Users, Radio, Newspaper, X, Check, Eye, EyeOff } from "lucide-react";
+import {
+  Lock, LogOut, Plus, Trash2, Pencil, Users, Radio, Newspaper,
+  X, Check, Eye, EyeOff, Upload, Image as ImageIcon, Music,
+} from "lucide-react";
 import { PageHeader } from "@/components/page-shell";
 
 export const Route = createFileRoute("/area-personal")({
@@ -13,7 +16,7 @@ export const Route = createFileRoute("/area-personal")({
   component: AreaPersonalPage,
 });
 
-// ─── helpers ────────────────────────────────────────────────────────────────
+// ─── helpers ─────────────────────────────────────────────────────────────────
 
 function RolBadge({ rol }: { rol: UserRole }) {
   const map: Record<UserRole, { label: string; color: string }> = {
@@ -31,7 +34,7 @@ function RolBadge({ rol }: { rol: UserRole }) {
   );
 }
 
-// ─── login ──────────────────────────────────────────────────────────────────
+// ─── login ───────────────────────────────────────────────────────────────────
 
 function LoginForm({ onLogin }: { onLogin: (session: Session) => void }) {
   const [email, setEmail] = useState("");
@@ -103,7 +106,7 @@ function LoginForm({ onLogin }: { onLogin: (session: Session) => void }) {
   );
 }
 
-// ─── dashboard per role ──────────────────────────────────────────────────────
+// ─── dashboard direccion ──────────────────────────────────────────────────────
 
 function DireccionDashboard({ user }: { user: AppUser }) {
   const [tab, setTab] = useState<"programas" | "noticias" | "usuarios">("programas");
@@ -130,12 +133,100 @@ function DireccionDashboard({ user }: { user: AppUser }) {
   );
 }
 
-// ─── panels ─────────────────────────────────────────────────────────────────
+// ─── FileUploadField ──────────────────────────────────────────────────────────
+
+function FileUploadField({
+  label,
+  accept,
+  icon: Icon,
+  onUploaded,
+  currentUrl,
+}: {
+  label: string;
+  accept: string;
+  icon: React.ElementType;
+  onUploaded: (url: string) => void;
+  currentUrl?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [fileName, setFileName] = useState("");
+
+  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError("");
+    setUploading(true);
+    setFileName(file.name);
+    try {
+      const folder = accept.includes("audio") ? "audio" : "imagenes";
+      const url = await uploadMedia(file, folder);
+      onUploaded(url);
+    } catch (err: any) {
+      setError("Error al subir: " + (err?.message ?? "desconocido"));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</label>
+      <div
+        onClick={() => inputRef.current?.click()}
+        className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-sm transition hover:border-primary/40 hover:bg-primary/5"
+      >
+        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <span className="truncate text-muted-foreground">
+          {uploading ? "Subiendo..." : fileName || (currentUrl ? "Archivo actual (haz clic para cambiar)" : "Haz clic para seleccionar archivo")}
+        </span>
+        <Upload className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
+      </div>
+      <input ref={inputRef} type="file" accept={accept} onChange={handleChange} className="hidden" />
+      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      {currentUrl && !uploading && (
+        <p className="mt-1 truncate text-xs text-green-400">✓ Archivo subido correctamente</p>
+      )}
+    </div>
+  );
+}
+
+// ─── ProgramasPanel ───────────────────────────────────────────────────────────
+
+type ProgramaForm = {
+  open: boolean;
+  id?: string;
+  titulo: string;
+  descripcion: string;
+  slug: string;
+  categoria: string;
+  sinopsis: string;
+  frecuencia: string;
+  presentadores: string;
+  imagen_url: string;
+  audio_url: string;
+  episodio_unico: boolean;
+};
+
+const FORM_VACIO: ProgramaForm = {
+  open: false,
+  titulo: "",
+  descripcion: "",
+  slug: "",
+  categoria: "",
+  sinopsis: "",
+  frecuencia: "",
+  presentadores: "",
+  imagen_url: "",
+  audio_url: "",
+  episodio_unico: false,
+};
 
 function ProgramasPanel() {
   const [programas, setProgramas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<{ open: boolean; id?: string; titulo: string; descripcion: string; slug: string }>({ open: false, titulo: "", descripcion: "", slug: "" });
+  const [form, setForm] = useState<ProgramaForm>(FORM_VACIO);
 
   useEffect(() => { fetchProgramas(); }, []);
 
@@ -146,14 +237,33 @@ function ProgramasPanel() {
     setLoading(false);
   }
 
+  function slugify(text: string) {
+    return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+
+  function handleTituloChange(v: string) {
+    setForm(f => ({ ...f, titulo: v, slug: f.id ? f.slug : slugify(v) }));
+  }
+
   async function handleSave() {
     if (!form.titulo || !form.slug) return;
+    const payload = {
+      titulo: form.titulo,
+      descripcion: form.descripcion,
+      slug: form.slug,
+      categoria: form.categoria,
+      sinopsis: form.sinopsis,
+      fecha_emision: form.frecuencia,
+      imagen_url: form.imagen_url || null,
+      audio_url: form.audio_url || null,
+      episodio_unico: form.episodio_unico,
+    };
     if (form.id) {
-      await supabase.from("programas").update({ titulo: form.titulo, descripcion: form.descripcion, slug: form.slug }).eq("id", form.id);
+      await supabase.from("programas").update(payload).eq("id", form.id);
     } else {
-      await supabase.from("programas").insert({ titulo: form.titulo, descripcion: form.descripcion, slug: form.slug });
+      await supabase.from("programas").insert(payload);
     }
-    setForm({ open: false, titulo: "", descripcion: "", slug: "" });
+    setForm(FORM_VACIO);
     fetchProgramas();
   }
 
@@ -164,21 +274,79 @@ function ProgramasPanel() {
   }
 
   return (
-    <Panel
-      title="Programas"
-      onAdd={() => setForm({ open: true, titulo: "", descripcion: "", slug: "" })}
-    >
+    <Panel title="Programas" onAdd={() => setForm({ ...FORM_VACIO, open: true })}>
       {form.open && (
-        <FormModal title={form.id ? "Editar programa" : "Nuevo programa"} onClose={() => setForm({ open: false, titulo: "", descripcion: "", slug: "" })} onSave={handleSave}>
-          <Field label="Título" value={form.titulo} onChange={(v) => setForm(f => ({ ...f, titulo: v }))} />
-          <Field label="Slug (URL)" value={form.slug} onChange={(v) => setForm(f => ({ ...f, slug: v }))} placeholder="buenos-dias" />
-          <Field label="Descripción" value={form.descripcion} onChange={(v) => setForm(f => ({ ...f, descripcion: v }))} textarea />
+        <FormModal
+          title={form.id ? "Editar programa" : "Nuevo programa"}
+          onClose={() => setForm(FORM_VACIO)}
+          onSave={handleSave}
+        >
+          <Field label="Título" value={form.titulo} onChange={handleTituloChange} />
+          <Field label="Slug (URL)" value={form.slug} onChange={(v) => setForm(f => ({ ...f, slug: v }))} placeholder="buenos-dias-bezmiliana" />
+          <Field label="Categoría" value={form.categoria} onChange={(v) => setForm(f => ({ ...f, categoria: v }))} placeholder="Magazine, Música, Deportes…" />
+          <Field label="Descripción corta" value={form.descripcion} onChange={(v) => setForm(f => ({ ...f, descripcion: v }))} textarea />
+          <Field label="Sinopsis larga" value={form.sinopsis} onChange={(v) => setForm(f => ({ ...f, sinopsis: v }))} textarea />
+          <Field label="Frecuencia / Horario" value={form.frecuencia} onChange={(v) => setForm(f => ({ ...f, frecuencia: v }))} placeholder="Lunes y miércoles · 08:15" />
+          <Field label="Presentadores (separados por coma)" value={form.presentadores} onChange={(v) => setForm(f => ({ ...f, presentadores: v }))} placeholder="Ana García, Luis Pérez" />
+
+          <FileUploadField
+            label="Imagen de portada"
+            accept="image/*"
+            icon={ImageIcon}
+            currentUrl={form.imagen_url}
+            onUploaded={(url) => setForm(f => ({ ...f, imagen_url: url }))}
+          />
+
+          {/* Episodio único: solo mostrar campo audio si está marcado */}
+          <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <input
+              id="episodio-unico"
+              type="checkbox"
+              checked={form.episodio_unico}
+              onChange={(e) => setForm(f => ({ ...f, episodio_unico: e.target.checked }))}
+              className="h-4 w-4 rounded accent-primary"
+            />
+            <label htmlFor="episodio-unico" className="cursor-pointer text-sm">
+              <span className="font-medium">Episodio único</span>
+              <span className="ml-2 text-xs text-muted-foreground">(el programa tiene un solo audio, sin episodios separados)</span>
+            </label>
+          </div>
+
+          {form.episodio_unico && (
+            <FileUploadField
+              label="Audio del programa"
+              accept="audio/*"
+              icon={Music}
+              currentUrl={form.audio_url}
+              onUploaded={(url) => setForm(f => ({ ...f, audio_url: url }))}
+            />
+          )}
         </FormModal>
       )}
+
       {loading ? <Spinner /> : programas.length === 0 ? <Empty text="No hay programas todavía" /> : (
         <ul className="space-y-3">
           {programas.map((p) => (
-            <ItemRow key={p.id} title={p.titulo} subtitle={`/${p.slug}`} onEdit={() => setForm({ open: true, id: p.id, titulo: p.titulo, descripcion: p.descripcion ?? "", slug: p.slug })} onDelete={() => handleDelete(p.id)} />
+            <ItemRow
+              key={p.id}
+              title={p.titulo}
+              subtitle={`/${p.slug}${p.episodio_unico ? " · episodio único" : ""}`}
+              onEdit={() => setForm({
+                open: true,
+                id: p.id,
+                titulo: p.titulo,
+                descripcion: p.descripcion ?? "",
+                slug: p.slug,
+                categoria: p.categoria ?? "",
+                sinopsis: p.sinopsis ?? "",
+                frecuencia: p.fecha_emision ?? "",
+                presentadores: "",
+                imagen_url: p.imagen_url ?? "",
+                audio_url: p.audio_url ?? "",
+                episodio_unico: p.episodio_unico ?? false,
+              })}
+              onDelete={() => handleDelete(p.id)}
+            />
           ))}
         </ul>
       )}
@@ -186,10 +354,12 @@ function ProgramasPanel() {
   );
 }
 
+// ─── NoticiasPanel ────────────────────────────────────────────────────────────
+
 function NoticiasPanel() {
   const [noticias, setNoticias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<{ open: boolean; id?: string; titulo: string; contenido: string; publicada: boolean }>({ open: false, titulo: "", contenido: "", publicada: true });
+  const [form, setForm] = useState<{ open: boolean; id?: string; titulo: string; texto: string }>({ open: false, titulo: "", texto: "" });
 
   useEffect(() => { fetchNoticias(); }, []);
 
@@ -203,11 +373,11 @@ function NoticiasPanel() {
   async function handleSave() {
     if (!form.titulo) return;
     if (form.id) {
-      await supabase.from("noticias").update({ titulo: form.titulo, contenido: form.contenido, publicada: form.publicada }).eq("id", form.id);
+      await supabase.from("noticias").update({ titulo: form.titulo, texto: form.texto }).eq("id", form.id);
     } else {
-      await supabase.from("noticias").insert({ titulo: form.titulo, contenido: form.contenido, publicada: form.publicada });
+      await supabase.from("noticias").insert({ titulo: form.titulo, texto: form.texto });
     }
-    setForm({ open: false, titulo: "", contenido: "", publicada: true });
+    setForm({ open: false, titulo: "", texto: "" });
     fetchNoticias();
   }
 
@@ -218,27 +388,25 @@ function NoticiasPanel() {
   }
 
   return (
-    <Panel title="Noticias" onAdd={() => setForm({ open: true, titulo: "", contenido: "", publicada: true })}>
+    <Panel title="Noticias" onAdd={() => setForm({ open: true, titulo: "", texto: "" })}>
       {form.open && (
-        <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm({ open: false, titulo: "", contenido: "", publicada: true })} onSave={handleSave}>
+        <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm({ open: false, titulo: "", texto: "" })} onSave={handleSave}>
           <Field label="Título" value={form.titulo} onChange={(v) => setForm(f => ({ ...f, titulo: v }))} />
-          <Field label="Contenido" value={form.contenido} onChange={(v) => setForm(f => ({ ...f, contenido: v }))} textarea />
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={form.publicada} onChange={(e) => setForm(f => ({ ...f, publicada: e.target.checked }))} className="rounded" />
-            Publicada
-          </label>
+          <Field label="Texto" value={form.texto} onChange={(v) => setForm(f => ({ ...f, texto: v }))} textarea />
         </FormModal>
       )}
       {loading ? <Spinner /> : noticias.length === 0 ? <Empty text="No hay noticias todavía" /> : (
         <ul className="space-y-3">
           {noticias.map((n) => (
-            <ItemRow key={n.id} title={n.titulo} subtitle={n.publicada ? "Publicada" : "Borrador"} onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, contenido: n.contenido ?? "", publicada: n.publicada })} onDelete={() => handleDelete(n.id)} />
+            <ItemRow key={n.id} title={n.titulo} subtitle={n.fecha} onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, texto: n.texto ?? "" })} onDelete={() => handleDelete(n.id)} />
           ))}
         </ul>
       )}
     </Panel>
   );
 }
+
+// ─── UsuariosPanel ────────────────────────────────────────────────────────────
 
 function UsuariosPanel() {
   const [usuarios, setUsuarios] = useState<any[]>([]);
@@ -259,8 +427,6 @@ function UsuariosPanel() {
     if (form.id) {
       await supabase.from("perfiles").update({ nombre: form.nombre, rol: form.rol }).eq("id", form.id);
     } else {
-      // Crear usuario en Auth via admin no es posible desde el cliente anon.
-      // Se guarda directamente en perfiles como placeholder.
       await supabase.from("perfiles").insert({ nombre: form.nombre, email: form.email, rol: form.rol });
     }
     setForm({ open: false, nombre: "", email: "", rol: "locutor", password: "" });
@@ -300,12 +466,11 @@ function UsuariosPanel() {
   );
 }
 
-// ─── role dashboards (non-direccion) ────────────────────────────────────────
+// ─── otros dashboards ─────────────────────────────────────────────────────────
 
 function LocutorDashboard() {
   return (
     <Panel title="Mis programas" hideAdd>
-      <p className="text-sm text-muted-foreground">Aquí verás los programas asignados a tu perfil.</p>
       <Empty text="No tienes programas asignados todavía" />
     </Panel>
   );
@@ -335,7 +500,7 @@ function RrsssDashboard() {
   );
 }
 
-// ─── small shared components ─────────────────────────────────────────────────
+// ─── shared UI ────────────────────────────────────────────────────────────────
 
 function Panel({ title, onAdd, hideAdd, children }: { title: string; onAdd?: () => void; hideAdd?: boolean; children: React.ReactNode }) {
   return (
@@ -377,7 +542,7 @@ function Field({ label, value, onChange, placeholder, textarea }: { label: strin
     <div>
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</label>
       {textarea
-        ? <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={4} placeholder={placeholder} className={cls} />
+        ? <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} placeholder={placeholder} className={cls} />
         : <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={cls} />
       }
     </div>
@@ -408,7 +573,7 @@ function Empty({ text }: { text: string }) {
   return <div className="py-8 text-center text-sm text-muted-foreground">{text}</div>;
 }
 
-// ─── main page ───────────────────────────────────────────────────────────────
+// ─── main page ────────────────────────────────────────────────────────────────
 
 function AreaPersonalPage() {
   const [session, setSession] = useState<Session | null>(null);
@@ -428,17 +593,12 @@ function AreaPersonalPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-async function loadProfile(userId: string) {
-  setLoadingProfile(true);
-  const { data, error } = await supabase.from("perfiles").select("*").eq("id", userId).single();
-  if (data) {
-    setAppUser(data as AppUser);
-  } else {
-    console.error("Error cargando perfil:", error);
+  async function loadProfile(userId: string) {
+    setLoadingProfile(true);
+    const { data } = await supabase.from("perfiles").select("*").eq("id", userId).single();
+    if (data) setAppUser(data as AppUser);
     setLoadingProfile(false);
   }
-  setLoadingProfile(false);
-}
 
   async function handleLogout() {
     await supabase.auth.signOut();

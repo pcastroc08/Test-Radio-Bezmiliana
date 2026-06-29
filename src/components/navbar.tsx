@@ -73,12 +73,7 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <Link
-              to="/area-personal"
-              className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-sm font-medium text-primary transition hover:bg-primary/20"
-            >
-              <Lock className="h-3.5 w-3.5" /> Área personal
-            </Link>
+            {/* Área personal oculta intencionalmente */}
             <button
               onClick={toggle}
               aria-label={theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"}
@@ -117,12 +112,7 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
-            <Link
-              to="/area-personal"
-              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary/10"
-            >
-              <Lock className="h-3.5 w-3.5" /> Área personal
-            </Link>
+            {/* Área personal oculta intencionalmente */}
           </div>
         </div>
       </div>

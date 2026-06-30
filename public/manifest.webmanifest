@@ -9,17 +9,7 @@
   "theme_color": "#07111F",
   "lang": "es",
   "icons": [
-    {
-      "src": "/__l5e/assets-v1/ccebfbef-f05d-4659-996f-31fb83e29f3f/radio-bezmiliana-logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/__l5e/assets-v1/ccebfbef-f05d-4659-996f-31fb83e29f3f/radio-bezmiliana-logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    }
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
   ]
 }

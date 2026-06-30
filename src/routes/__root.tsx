@@ -19,7 +19,7 @@ import { Navbar } from "../components/navbar";
 import { Footer } from "../components/footer";
 import { SplashScreen } from "../components/splash-screen";
 import { BackToTop } from "../components/back-to-top";
-import logoAsset from "../assets/logo.png.asset.json";
+const logoAsset = { url: "/favicon.png" };
 
 function NotFoundComponent() {
   return (

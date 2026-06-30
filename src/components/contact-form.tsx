@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Send, CheckCircle2, AlertCircle } from "lucide-react";
-import { FORMSPREE_ENDPOINT } from "@/utils/contact";
+import { supabase } from "@/lib/supabase";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
@@ -16,16 +16,12 @@ export function ContactForm() {
     const data = new FormData(form);
 
     try {
-      if (FORMSPREE_ENDPOINT) {
-        const res = await fetch(FORMSPREE_ENDPOINT, {
-          method: "POST",
-          body: data,
-          headers: { Accept: "application/json" },
-        });
-        if (!res.ok) throw new Error("No se ha podido enviar.");
-      } else {
-        await new Promise((r) => setTimeout(r, 900));
-      }
+      const { error: err } = await supabase.from("mensajes_contacto").insert({
+        nombre: data.get("nombre") as string,
+        email: data.get("email") as string,
+        mensaje: data.get("mensaje") as string,
+      });
+      if (err) throw new Error(err.message);
       setStatus("ok");
       form.reset();
     } catch (err) {
@@ -54,11 +50,7 @@ export function ContactForm() {
       </div>
 
       <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">
-          {FORMSPREE_ENDPOINT
-            ? "Tu mensaje se enviará al equipo de redacción."
-            : "Formulario en modo demo. Configura Formspree en src/utils/contact.ts."}
-        </p>
+        <p className="text-xs text-muted-foreground">Tu mensaje llegará directamente al equipo de Radio Bezmiliana.</p>
         <button
           type="submit"
           disabled={status === "sending"}
@@ -71,7 +63,7 @@ export function ContactForm() {
 
       {status === "ok" && (
         <div className="flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
-          <CheckCircle2 className="h-4 w-4" /> Mensaje enviado. ¡Te responderemos pronto!
+          <CheckCircle2 className="h-4 w-4" /> ¡Mensaje enviado! Te responderemos pronto.
         </div>
       )}
       {status === "error" && (

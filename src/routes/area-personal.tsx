@@ -109,12 +109,12 @@ function LoginForm({ onLogin }: { onLogin: (session: Session) => void }) {
 // ─── dashboard direccion ──────────────────────────────────────────────────────
 
 function DireccionDashboard({ user }: { user: AppUser }) {
-  const [tab, setTab] = useState<"programas" | "noticias" | "usuarios">("programas");
+  const [tab, setTab] = useState<"programas" | "noticias" | "equipo" | "usuarios">("programas");
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap gap-2">
-        {(["programas", "noticias", "usuarios"] as const).map((t) => (
+        {(["programas", "noticias", "equipo", "usuarios"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -122,12 +122,14 @@ function DireccionDashboard({ user }: { user: AppUser }) {
           >
             {t === "programas" ? <><Radio className="mr-1.5 inline h-3.5 w-3.5" />Programas</> :
              t === "noticias" ? <><Newspaper className="mr-1.5 inline h-3.5 w-3.5" />Noticias</> :
+             t === "equipo" ? <><Users className="mr-1.5 inline h-3.5 w-3.5" />Equipo</> :
              <><Users className="mr-1.5 inline h-3.5 w-3.5" />Usuarios</>}
           </button>
         ))}
       </div>
       {tab === "programas" && <ProgramasPanel />}
       {tab === "noticias" && <NoticiasPanel />}
+      {tab === "equipo" && <EquipoPanel />}
       {tab === "usuarios" && <UsuariosPanel />}
     </div>
   );
@@ -438,6 +440,103 @@ function NoticiasPanel() {
             <ItemRow key={n.id} title={n.titulo} subtitle={`/${n.slug ?? ""}`}
               onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, slug: n.slug ?? slugifyNoticia(n.titulo), sinopsis: n.sinopsis ?? "", texto: n.texto ?? "", imagen_url: n.imagen_url ?? "", fecha: n.fecha ?? new Date().toISOString().slice(0, 10) })}
               onDelete={() => handleDelete(n.id)} />
+          ))}
+        </ul>
+      )}
+    </Panel>
+  );
+}
+
+// ─── EquipoPanel ──────────────────────────────────────────────────────────────
+
+const CATEGORIAS_EQUIPO = [
+  { value: "direccion", label: "Dirección" },
+  { value: "locutores", label: "Locutores" },
+  { value: "redaccion", label: "Redacción" },
+  { value: "tecnicos", label: "Técnicos" },
+  { value: "redes", label: "Redes sociales" },
+];
+
+type MiembroForm = { open: boolean; id?: string; nombre: string; rol: string; categoria: string; descripcion: string; foto_url: string };
+const MIEMBRO_VACIO: MiembroForm = { open: false, nombre: "", rol: "", categoria: "locutores", descripcion: "", foto_url: "" };
+
+function EquipoPanel() {
+  const [equipo, setEquipo] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState<MiembroForm>(MIEMBRO_VACIO);
+
+  useEffect(() => { fetchEquipo(); }, []);
+
+  async function fetchEquipo() {
+    setLoading(true);
+    const { data } = await supabase.from("equipo").select("*").order("orden", { ascending: true });
+    setEquipo(data ?? []);
+    setLoading(false);
+  }
+
+  async function handleSave() {
+    if (!form.nombre || !form.categoria) return;
+    const payload = {
+      nombre: form.nombre,
+      rol: form.rol || null,
+      categoria: form.categoria,
+      descripcion: form.descripcion || null,
+      foto_url: form.foto_url || null,
+    };
+    if (form.id) {
+      await supabase.from("equipo").update(payload).eq("id", form.id);
+    } else {
+      await supabase.from("equipo").insert(payload);
+    }
+    setForm(MIEMBRO_VACIO);
+    fetchEquipo();
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("¿Eliminar este miembro?")) return;
+    await supabase.from("equipo").delete().eq("id", id);
+    fetchEquipo();
+  }
+
+  return (
+    <Panel title="Equipo" onAdd={() => setForm({ ...MIEMBRO_VACIO, open: true })}>
+      <p className="mb-4 -mt-2 text-xs text-muted-foreground">
+        Los cambios se reflejan automáticamente en la página pública de Equipo.
+      </p>
+      {form.open && (
+        <FormModal title={form.id ? "Editar miembro" : "Nuevo miembro"} onClose={() => setForm(MIEMBRO_VACIO)} onSave={handleSave}>
+          <Field label="Nombre" value={form.nombre} onChange={(v) => setForm(f => ({ ...f, nombre: v }))} />
+          <Field label="Rol / cargo" value={form.rol} onChange={(v) => setForm(f => ({ ...f, rol: v }))} placeholder="Locutora · Magazine" />
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</label>
+            <select
+              value={form.categoria}
+              onChange={(e) => setForm(f => ({ ...f, categoria: e.target.value }))}
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm outline-none transition focus:border-primary/50"
+            >
+              {CATEGORIAS_EQUIPO.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </div>
+          <Field label="Descripción / bio" value={form.descripcion} onChange={(v) => setForm(f => ({ ...f, descripcion: v }))} textarea />
+          <FileUploadField
+            label="Foto"
+            accept="image/*"
+            icon={ImageIcon}
+            currentUrl={form.foto_url}
+            onUploaded={(url) => setForm(f => ({ ...f, foto_url: url }))}
+          />
+        </FormModal>
+      )}
+      {loading ? <Spinner /> : equipo.length === 0 ? <Empty text="No hay miembros todavía" /> : (
+        <ul className="space-y-3">
+          {equipo.map((m) => (
+            <ItemRow
+              key={m.id}
+              title={m.nombre}
+              subtitle={`${CATEGORIAS_EQUIPO.find(c => c.value === m.categoria)?.label ?? m.categoria}${m.rol ? " · " + m.rol : ""}`}
+              onEdit={() => setForm({ open: true, id: m.id, nombre: m.nombre, rol: m.rol ?? "", categoria: m.categoria, descripcion: m.descripcion ?? "", foto_url: m.foto_url ?? "" })}
+              onDelete={() => handleDelete(m.id)}
+            />
           ))}
         </ul>
       )}

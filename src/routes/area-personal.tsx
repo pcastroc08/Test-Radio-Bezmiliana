@@ -356,8 +356,8 @@ function ProgramasPanel() {
 
 // ─── NoticiasPanel ────────────────────────────────────────────────────────────
 
-type NoticiaForm = { open: boolean; id?: string; titulo: string; slug: string; sinopsis: string; texto: string; imagen_url: string };
-const NOTICIA_VACIA: NoticiaForm = { open: false, titulo: "", slug: "", sinopsis: "", texto: "", imagen_url: "" };
+type NoticiaForm = { open: boolean; id?: string; titulo: string; slug: string; sinopsis: string; texto: string; imagen_url: string; fecha: string };
+const NOTICIA_VACIA: NoticiaForm = { open: false, titulo: "", slug: "", sinopsis: "", texto: "", imagen_url: "", fecha: new Date().toISOString().slice(0, 10) };
 
 function slugifyNoticia(text: string) {
   return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -389,6 +389,7 @@ function NoticiasPanel() {
       sinopsis: form.sinopsis,
       texto: form.texto,
       imagen_url: form.imagen_url || null,
+      fecha: form.fecha || null,
     };
     if (form.id) {
       await supabase.from("noticias").update(payload).eq("id", form.id);
@@ -411,6 +412,15 @@ function NoticiasPanel() {
         <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm(NOTICIA_VACIA)} onSave={handleSave}>
           <Field label="Título" value={form.titulo} onChange={handleTituloChange} />
           <Field label="Slug (URL)" value={form.slug} onChange={(v) => setForm(f => ({ ...f, slug: v }))} placeholder="festival-de-radio-2026" />
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha</label>
+            <input
+              type="date"
+              value={form.fecha}
+              onChange={(e) => setForm(f => ({ ...f, fecha: e.target.value }))}
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm outline-none transition focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+            />
+          </div>
           <Field label="Sinopsis (resumen corto)" value={form.sinopsis} onChange={(v) => setForm(f => ({ ...f, sinopsis: v }))} textarea />
           <Field label="Cuerpo de la noticia" value={form.texto} onChange={(v) => setForm(f => ({ ...f, texto: v }))} textarea />
           <FileUploadField
@@ -426,7 +436,7 @@ function NoticiasPanel() {
         <ul className="space-y-3">
           {noticias.map((n) => (
             <ItemRow key={n.id} title={n.titulo} subtitle={`/${n.slug ?? ""}`}
-              onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, slug: n.slug ?? slugifyNoticia(n.titulo), sinopsis: n.sinopsis ?? "", texto: n.texto ?? "", imagen_url: n.imagen_url ?? "" })}
+              onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, slug: n.slug ?? slugifyNoticia(n.titulo), sinopsis: n.sinopsis ?? "", texto: n.texto ?? "", imagen_url: n.imagen_url ?? "", fecha: n.fecha ?? new Date().toISOString().slice(0, 10) })}
               onDelete={() => handleDelete(n.id)} />
           ))}
         </ul>

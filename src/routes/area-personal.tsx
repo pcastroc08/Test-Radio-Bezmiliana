@@ -356,10 +356,17 @@ function ProgramasPanel() {
 
 // ─── NoticiasPanel ────────────────────────────────────────────────────────────
 
+type NoticiaForm = { open: boolean; id?: string; titulo: string; slug: string; sinopsis: string; texto: string; imagen_url: string };
+const NOTICIA_VACIA: NoticiaForm = { open: false, titulo: "", slug: "", sinopsis: "", texto: "", imagen_url: "" };
+
+function slugifyNoticia(text: string) {
+  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 function NoticiasPanel() {
   const [noticias, setNoticias] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<{ open: boolean; id?: string; titulo: string; texto: string }>({ open: false, titulo: "", texto: "" });
+  const [form, setForm] = useState<NoticiaForm>(NOTICIA_VACIA);
 
   useEffect(() => { fetchNoticias(); }, []);
 
@@ -370,14 +377,25 @@ function NoticiasPanel() {
     setLoading(false);
   }
 
+  function handleTituloChange(v: string) {
+    setForm(f => ({ ...f, titulo: v, slug: f.id ? f.slug : slugifyNoticia(v) }));
+  }
+
   async function handleSave() {
-    if (!form.titulo) return;
+    if (!form.titulo || !form.slug) return;
+    const payload = {
+      titulo: form.titulo,
+      slug: form.slug,
+      sinopsis: form.sinopsis,
+      texto: form.texto,
+      imagen_url: form.imagen_url || null,
+    };
     if (form.id) {
-      await supabase.from("noticias").update({ titulo: form.titulo, texto: form.texto }).eq("id", form.id);
+      await supabase.from("noticias").update(payload).eq("id", form.id);
     } else {
-      await supabase.from("noticias").insert({ titulo: form.titulo, texto: form.texto });
+      await supabase.from("noticias").insert(payload);
     }
-    setForm({ open: false, titulo: "", texto: "" });
+    setForm(NOTICIA_VACIA);
     fetchNoticias();
   }
 
@@ -388,17 +406,28 @@ function NoticiasPanel() {
   }
 
   return (
-    <Panel title="Noticias" onAdd={() => setForm({ open: true, titulo: "", texto: "" })}>
+    <Panel title="Noticias" onAdd={() => setForm({ ...NOTICIA_VACIA, open: true })}>
       {form.open && (
-        <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm({ open: false, titulo: "", texto: "" })} onSave={handleSave}>
-          <Field label="Título" value={form.titulo} onChange={(v) => setForm(f => ({ ...f, titulo: v }))} />
-          <Field label="Texto" value={form.texto} onChange={(v) => setForm(f => ({ ...f, texto: v }))} textarea />
+        <FormModal title={form.id ? "Editar noticia" : "Nueva noticia"} onClose={() => setForm(NOTICIA_VACIA)} onSave={handleSave}>
+          <Field label="Título" value={form.titulo} onChange={handleTituloChange} />
+          <Field label="Slug (URL)" value={form.slug} onChange={(v) => setForm(f => ({ ...f, slug: v }))} placeholder="festival-de-radio-2026" />
+          <Field label="Sinopsis (resumen corto)" value={form.sinopsis} onChange={(v) => setForm(f => ({ ...f, sinopsis: v }))} textarea />
+          <Field label="Cuerpo de la noticia" value={form.texto} onChange={(v) => setForm(f => ({ ...f, texto: v }))} textarea />
+          <FileUploadField
+            label="Imagen de portada"
+            accept="image/*"
+            icon={ImageIcon}
+            currentUrl={form.imagen_url}
+            onUploaded={(url) => setForm(f => ({ ...f, imagen_url: url }))}
+          />
         </FormModal>
       )}
       {loading ? <Spinner /> : noticias.length === 0 ? <Empty text="No hay noticias todavía" /> : (
         <ul className="space-y-3">
           {noticias.map((n) => (
-            <ItemRow key={n.id} title={n.titulo} subtitle={n.fecha} onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, texto: n.texto ?? "" })} onDelete={() => handleDelete(n.id)} />
+            <ItemRow key={n.id} title={n.titulo} subtitle={`/${n.slug ?? ""}`}
+              onEdit={() => setForm({ open: true, id: n.id, titulo: n.titulo, slug: n.slug ?? slugifyNoticia(n.titulo), sinopsis: n.sinopsis ?? "", texto: n.texto ?? "", imagen_url: n.imagen_url ?? "" })}
+              onDelete={() => handleDelete(n.id)} />
           ))}
         </ul>
       )}

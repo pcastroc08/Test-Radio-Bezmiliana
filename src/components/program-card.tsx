@@ -1,12 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Mic } from "lucide-react";
-import { PROGRAMA_IMAGES } from "@/utils/images";
 
 export function ProgramCard({ programa }: { programa: any }) {
-  // Supabase records use imagen_url (full URL); local JSON uses imagen (key name)
-  const img = programa.imagen_url ?? (programa.imagen ? PROGRAMA_IMAGES[programa.imagen] : null);
-  const titulo = programa.titulo ?? programa.nombre;
-
+  const img = programa.imagen_url;
   return (
     <Link
       to="/programas/$slug"
@@ -17,7 +13,7 @@ export function ProgramCard({ programa }: { programa: any }) {
         {img ? (
           <img
             src={img}
-            alt={titulo}
+            alt={programa.titulo}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -35,7 +31,7 @@ export function ProgramCard({ programa }: { programa: any }) {
         )}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <h3 className="font-display text-xl font-bold tracking-tight">{titulo}</h3>
+        <h3 className="font-display text-xl font-bold tracking-tight">{programa.titulo}</h3>
         {programa.descripcion && (
           <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">{programa.descripcion}</p>
         )}

@@ -17,6 +17,7 @@ import { Route as EquipoRouteImport } from './routes/equipo'
 import { Route as DocumentosRouteImport } from './routes/documentos'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as AreaPersonalRouteImport } from './routes/area-personal'
+import { Route as TableroRouteImport } from './routes/tablero'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
@@ -61,6 +62,11 @@ const AreaPersonalRoute = AreaPersonalRouteImport.update({
   path: '/area-personal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TableroRoute = TableroRouteImport.update({
+  id: '/tablero',
+  path: '/tablero',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -80,6 +86,7 @@ const ProgramasSlugRoute = ProgramasSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/area-personal': typeof AreaPersonalRoute
+  '/tablero': typeof TableroRoute
   '/contacto': typeof ContactoRoute
   '/documentos': typeof DocumentosRoute
   '/equipo': typeof EquipoRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/area-personal': typeof AreaPersonalRoute
+  '/tablero': typeof TableroRoute
   '/contacto': typeof ContactoRoute
   '/documentos': typeof DocumentosRoute
   '/equipo': typeof EquipoRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/area-personal': typeof AreaPersonalRoute
+  '/tablero': typeof TableroRoute
   '/contacto': typeof ContactoRoute
   '/documentos': typeof DocumentosRoute
   '/equipo': typeof EquipoRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/area-personal'
+    | '/tablero'
     | '/contacto'
     | '/documentos'
     | '/equipo'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AreaPersonalRoute: typeof AreaPersonalRoute
+  TableroRoute: typeof TableroRoute
   ContactoRoute: typeof ContactoRoute
   DocumentosRoute: typeof DocumentosRoute
   EquipoRoute: typeof EquipoRoute
@@ -268,6 +279,7 @@ const ProgramasRouteWithChildren = ProgramasRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AreaPersonalRoute: AreaPersonalRoute,
+  TableroRoute: TableroRoute,
   ContactoRoute: ContactoRoute,
   DocumentosRoute: DocumentosRoute,
   EquipoRoute: EquipoRoute,
